@@ -1,0 +1,18 @@
+{
+  "name": "defidog-leetcode-examples",
+  "version": "1.0.0",
+  "description": "Hardhat unit tests for DeFi Dog LeetCode Solidity solutions",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "clean": "hardhat clean"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
