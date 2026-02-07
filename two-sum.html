@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Sum | DeFi Dog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-code: #0d0d14;
+            --neon-green: #00ff88;
+            --neon-pink: #ff00aa;
+            --neon-blue: #00d4ff;
+            --neon-yellow: #ffc800;
+            --text-primary: #ffffff;
+            --text-muted: #8888aa;
+            --border-color: #2a2a3a;
+
+            /* Syntax highlighting */
+            --syn-keyword: #ff79c6;
+            --syn-string: #f1fa8c;
+            --syn-number: #bd93f9;
+            --syn-comment: #6272a4;
+            --syn-function: #50fa7b;
+            --syn-type: #8be9fd;
+            --syn-operator: #ff79c6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 20%, rgba(0, 255, 136, 0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 0, 170, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, var(--bg-dark) 0%, transparent 100%);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 10px var(--neon-green));
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-green);
+        }
+
+        /* Main Content */
+        main {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        /* Problem Header */
+        .problem-header {
+            margin-bottom: 3rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--neon-green);
+        }
+
+        .problem-number {
+            font-size: 0.9rem;
+            color: var(--neon-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .problem-title .gradient {
+            background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .problem-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .difficulty-badge {
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .difficulty-badge.easy {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        .difficulty-badge.medium {
+            background: rgba(255, 200, 0, 0.15);
+            color: var(--neon-yellow);
+            border: 1px solid var(--neon-yellow);
+        }
+
+        .difficulty-badge.hard {
+            background: rgba(255, 0, 170, 0.15);
+            color: var(--neon-pink);
+            border: 1px solid var(--neon-pink);
+        }
+
+        .tag {
+            padding: 0.3rem 0.75rem;
+            font-size: 0.7rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        /* Problem Description */
+        .problem-description {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .problem-description h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--neon-green);
+        }
+
+        .problem-description p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .problem-description ul {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .problem-description li {
+            color: var(--text-muted);
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .problem-description li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--neon-green);
+        }
+
+        .example-box {
+            background: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+        }
+
+        .example-box .label {
+            color: var(--neon-pink);
+            font-weight: 500;
+        }
+
+        .example-box .value {
+            color: var(--neon-green);
+        }
+
+        /* Solution Tabs */
+        .solutions-section {
+            margin-top: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .section-header::before {
+            content: '//';
+            color: var(--neon-green);
+            font-weight: 700;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px 6px 0 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            border-color: var(--text-muted);
+        }
+
+        .tab.active {
+            background: var(--bg-code);
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+            border-bottom-color: var(--bg-code);
+        }
+
+        .tab-icon {
+            font-size: 1.1rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Code Block */
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 0 8px 8px 8px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-filename {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-filename .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-filename .dot.ts {
+            background: var(--neon-blue);
+        }
+
+        .code-filename .dot.sol {
+            background: var(--neon-pink);
+        }
+
+        .code-filename .dot.go {
+            background: #00ADD8;
+        }
+
+        .copy-btn {
+            padding: 0.4rem 0.8rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-muted);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .copy-btn.copied {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        pre {
+            margin: 0;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* Syntax Highlighting */
+        .keyword { color: var(--syn-keyword); }
+        .string { color: var(--syn-string); }
+        .number { color: var(--syn-number); }
+        .comment { color: var(--syn-comment); font-style: italic; }
+        .function { color: var(--syn-function); }
+        .type { color: var(--syn-type); }
+        .operator { color: var(--syn-operator); }
+        .variable { color: var(--text-primary); }
+        .property { color: var(--neon-green); }
+
+        /* Walkthrough Section */
+        .walkthrough {
+            margin-top: 3rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .walkthrough h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .walkthrough h3::before {
+            content: '🐺';
+        }
+
+        .step {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-dark);
+            border: 1px solid var(--neon-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .step-content code {
+            background: var(--bg-dark);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            color: var(--neon-green);
+            font-size: 0.8rem;
+        }
+
+        /* Complexity */
+        .complexity {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .complexity-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .complexity-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .complexity-value {
+            font-family: 'Fira Code', monospace;
+            color: var(--neon-blue);
+            font-weight: 500;
+        }
+
+        /* Video Embed */
+        .video-section {
+            margin-top: 3rem;
+        }
+
+        .video-container {
+            position: relative;
+            aspect-ratio: 16/9;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-placeholder {
+            text-align: center;
+        }
+
+        .play-btn {
+            width: 80px;
+            height: 80px;
+            border: 2px solid var(--neon-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--neon-green);
+            margin: 0 auto 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            background: var(--neon-green);
+            color: var(--bg-dark);
+            box-shadow: 0 0 40px var(--neon-green);
+        }
+
+        .video-placeholder p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .footer-text code {
+            color: var(--neon-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            main {
+                padding: 6rem 1rem 2rem;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .complexity {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <nav>
+        <a href="index.html" class="logo">
+            <span class="logo-icon">🐺</span>
+            <span>DeFi Dog</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">VIDEOS</a></li>
+            <li><a href="#">PROBLEMS</a></li>
+            <li><a href="#">ABOUT</a></li>
+            <li><a href="#">GITHUB</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="problem-header">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <a href="#">Problems</a>
+                <span>/</span>
+                <span>Two Sum</span>
+            </div>
+            <div class="problem-number">LeetCode #1</div>
+            <h1 class="problem-title"><span class="gradient">Two Sum</span></h1>
+            <div class="problem-meta">
+                <span class="difficulty-badge easy">Easy</span>
+                <span class="tag">Array</span>
+                <span class="tag">Hash Table</span>
+            </div>
+        </div>
+
+        <div class="problem-description">
+            <h3>Problem Statement</h3>
+            <p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.</p>
+            <p>You may assume that each input would have exactly one solution, and you may not use the same element twice.</p>
+            <ul>
+                <li>Each input has exactly one solution</li>
+                <li>You cannot use the same element twice</li>
+                <li>You can return the answer in any order</li>
+            </ul>
+
+            <div class="example-box">
+                <span class="label">Input:</span> nums = <span class="value">[2,7,11,15]</span>, target = <span class="value">9</span><br>
+                <span class="label">Output:</span> <span class="value">[0,1]</span><br>
+                <span class="label">Explanation:</span> nums[0] + nums[1] = 2 + 7 = 9
+            </div>
+
+            <div class="example-box">
+                <span class="label">Input:</span> nums = <span class="value">[3,2,4]</span>, target = <span class="value">6</span><br>
+                <span class="label">Output:</span> <span class="value">[1,2]</span>
+            </div>
+        </div>
+
+        <div class="video-section">
+            <div class="section-header">
+                <h2>Watch the Breakdown</h2>
+            </div>
+            <div class="video-container">
+                <div class="video-placeholder">
+                    <div class="play-btn">▶</div>
+                    <p>Watch the full walkthrough on YouTube</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="solutions-section">
+            <div class="section-header">
+                <h2>Solutions</h2>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('typescript')">
+                    <span class="tab-icon">📘</span> TypeScript
+                </button>
+                <button class="tab" onclick="showTab('solidity')">
+                    <span class="tab-icon">💎</span> Solidity
+                </button>
+                <button class="tab" onclick="showTab('golang')">
+                    <span class="tab-icon">🐹</span> Go
+                </button>
+            </div>
+
+            <div id="typescript" class="tab-content active">
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-filename">
+                            <span class="dot ts"></span>
+                            twoSum.ts
+                        </span>
+                        <button class="copy-btn" onclick="copyCode('ts-code')">Copy</button>
+                    </div>
+                    <pre><code id="ts-code"><span class="keyword">function</span> <span class="function">twoSum</span>(nums: <span class="type">number</span>[], target: <span class="type">number</span>): <span class="type">number</span>[] {
+    <span class="keyword">const</span> seen: <span class="type">Map</span>&lt;<span class="type">number</span>, <span class="type">number</span>&gt; = <span class="keyword">new</span> <span class="type">Map</span>();
+
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; nums.<span class="property">length</span>; i++) {
+        <span class="keyword">const</span> complement = target - nums[i];
+
+        <span class="comment">// Check if we've seen the complement</span>
+        <span class="keyword">if</span> (seen.<span class="function">has</span>(complement)) {
+            <span class="keyword">return</span> [seen.<span class="function">get</span>(complement)!, i];
+        }
+
+        <span class="comment">// Store current number and its index</span>
+        seen.<span class="function">set</span>(nums[i], i);
+    }
+
+    <span class="keyword">return</span> []; <span class="comment">// No solution found</span>
+}</code></pre>
+                </div>
+            </div>
+
+            <div id="solidity" class="tab-content">
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-filename">
+                            <span class="dot sol"></span>
+                            TwoSum.sol
+                        </span>
+                        <button class="copy-btn" onclick="copyCode('sol-code')">Copy</button>
+                    </div>
+                    <pre><code id="sol-code"><span class="comment">// SPDX-License-Identifier: MIT</span>
+<span class="keyword">pragma solidity</span> ^0.8.0;
+
+<span class="keyword">contract</span> <span class="type">TwoSum</span> {
+    <span class="keyword">function</span> <span class="function">twoSum</span>(
+        <span class="type">int256</span>[] <span class="keyword">calldata</span> nums,
+        <span class="type">int256</span> target
+    ) <span class="keyword">external</span> <span class="keyword">pure</span> <span class="keyword">returns</span> (<span class="type">uint256</span>, <span class="type">uint256</span>) {
+        <span class="type">uint256</span> len = nums.<span class="property">length</span>;
+
+        <span class="comment">// O(n²) approach - mappings can't be created in memory</span>
+        <span class="keyword">for</span> (<span class="type">uint256</span> i = <span class="number">0</span>; i &lt; len; i++) {
+            <span class="type">int256</span> complement = target - nums[i];
+
+            <span class="keyword">for</span> (<span class="type">uint256</span> j = i + <span class="number">1</span>; j &lt; len; j++) {
+                <span class="keyword">if</span> (nums[j] == complement) {
+                    <span class="keyword">return</span> (i, j);
+                }
+            }
+        }
+
+        <span class="keyword">revert</span>(<span class="string">"No solution found"</span>);
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <div id="golang" class="tab-content">
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-filename">
+                            <span class="dot go"></span>
+                            two_sum.go
+                        </span>
+                        <button class="copy-btn" onclick="copyCode('go-code')">Copy</button>
+                    </div>
+                    <pre><code id="go-code"><span class="keyword">package</span> main
+
+<span class="keyword">func</span> <span class="function">twoSum</span>(nums []<span class="type">int</span>, target <span class="type">int</span>) []<span class="type">int</span> {
+    seen := <span class="function">make</span>(<span class="keyword">map</span>[<span class="type">int</span>]<span class="type">int</span>)
+
+    <span class="keyword">for</span> i, num := <span class="keyword">range</span> nums {
+        complement := target - num
+
+        <span class="comment">// Check if we've seen the complement</span>
+        <span class="keyword">if</span> j, ok := seen[complement]; ok {
+            <span class="keyword">return</span> []<span class="type">int</span>{j, i}
+        }
+
+        <span class="comment">// Store current number and its index</span>
+        seen[num] = i
+    }
+
+    <span class="keyword">return</span> []<span class="type">int</span>{} <span class="comment">// No solution found</span>
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="walkthrough">
+            <h3>How It Works</h3>
+
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <p><strong>Use a hash map</strong> to store numbers we've seen and their indices. This lets us look up complements in O(1) time.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <p><strong>For each number</strong>, calculate its complement: <code>complement = target - nums[i]</code></p>
+                    <p>Example: target = 9, nums[0] = 2 → complement = 7</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <p><strong>Check the map</strong> for the complement. If found, we have our pair! If not, store the current number.</p>
+                    <p>When we reach 7, we find 2 in our map → return [0, 1]</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <p><strong>Solidity note:</strong> Mappings can't be created in memory, so we use the O(n²) brute force approach. For on-chain use, consider storing a mapping in contract storage.</p>
+                </div>
+            </div>
+
+            <div class="complexity">
+                <div class="complexity-item">
+                    <span class="complexity-label">Time Complexity:</span>
+                    <span class="complexity-value">O(n)</span>
+                </div>
+                <div class="complexity-item">
+                    <span class="complexity-label">Space Complexity:</span>
+                    <span class="complexity-value">O(n)</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p class="footer-text">
+            Built with <code>love && solidity</code> by DeFi Dog © 2026
+        </p>
+    </footer>
+
+    <script>
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            event.target.closest('.tab').classList.add('active');
+        }
+
+        function copyCode(codeId) {
+            const code = document.getElementById(codeId).innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = event.target;
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
